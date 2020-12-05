@@ -12,16 +12,19 @@
 
 <style lang="scss" scoped>
   ul {
-    height: 50px;
-    line-height: 50px;
+    position: sticky;
+    top: 0rem;
+    height: 0.5rem;
+    line-height: 0.5rem;
     text-align: center;
     display: flex;
+    background: #fff;
     li{
       flex: 1;
     }
   }
   .active {
     color: blue;
-    border-bottom: 3px solid blue;
+    border-bottom: 0.03rem solid blue;
   }
 </style>

@@ -2,7 +2,9 @@
   <div id="app">
     <tabbar></tabbar>
     <!-- 路由容器 -->
-    <router-view></router-view>
+    <section class="content">
+      <router-view></router-view>
+    </section>
   </div>
 </template>
 
@@ -11,7 +13,6 @@ import tabbar from './components/Tabbar'
 export default {
   data () {
     return {
-
     }
   },
   components: {
@@ -22,6 +23,13 @@ export default {
 
 <style lang="scss">
   body{
-    font-size: 16px;
+    font-size: 16px!important;
+    background-color: #f4f4f4;
+  }
+  div {
+    box-sizing: border-box;
+  }
+  .content{
+    margin-bottom: 50px;
   }
 </style>

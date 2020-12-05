@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav  v-show="$route.meta.istrun">
     <ul>
       <!-- 声明式导航 -->
       <router-link to="/film" tag="li" active-class="linkactive">
@@ -34,6 +34,7 @@ export default {
     line-height: 25px;
     text-align: center;
     background: #fff;
+    z-index: 10;
     ul{
       display: flex;
       li{

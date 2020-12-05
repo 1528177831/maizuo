@@ -7,29 +7,47 @@ const routes = [
     // 实现路由懒加载
     path: '/film',
     component: () => import('../views/Film.vue'),
+    meta: {
+      istrun: true
+    },
     // 嵌套路由
     children: [
       {
         path: '/film/nowplaying',
-        component: () => import('../views/film/Nowplaying.vue')
+        component: () => import('../views/film/Nowplaying.vue'),
+        meta: {
+          istrun: true
+        }
       },
       {
         path: '/film/comingsoon',
-        component: () => import('../views/film/Comingsoon.vue')
+        component: () => import('../views/film/Comingsoon.vue'),
+        meta: {
+          istrun: true
+        }
       },
       {
         path: '',
-        component: () => import('../views/film/Nowplaying.vue')
+        component: () => import('../views/film/Nowplaying.vue'),
+        meta: {
+          istrun: true
+        }
       }
     ]
   },
   {
     path: '/cinema',
-    component: () => import('../views/Cinema.vue')
+    component: () => import('../views/Cinema.vue'),
+    meta: {
+      istrun: true
+    }
   },
   {
     path: '/center',
-    component: () => import('../views/Center.vue')
+    component: () => import('../views/Center.vue'),
+    meta: {
+      istrun: true
+    }
   },
   {
     path: '/login',

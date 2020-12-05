@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" style="background:#fff;">
     <ul>
       <li v-for="item in list" :key="item.filmId" @click="handleClick(item.filmId)">
         <div class='left-img'><img :src="item.poster"></div>
@@ -9,11 +9,10 @@
             <div class='grade' >{{item.grade ? '观众评分：' + item.grade : ""}}</div>
             <div class='actors'>
               <span>主演: </span>
-              <span v-for='(val, index) in item.actors' :key='index'>{{val.name}}</span>
+              <span>{{item.actors | actorsFilter}}</span>
             </div>
             <div class='info'>
-              <span>{{item.nation}}</span>
-              <span>{{item.runtime}}</span>
+              <span>{{item.nation}}</span> | <span>{{item.runtime}}分钟</span>
             </div>
           </div>
         </div>
@@ -23,7 +22,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import http from '@/until/http'
 export default {
   data () {
     return {
@@ -31,9 +30,8 @@ export default {
     }
   },
   created () {
-    axios.get('/api/gateway?cityId=110100&pageNum=1&pageSize=10&type=1&k=8886527', {
+    http('/api/gateway?cityId=110100&pageNum=1&pageSize=10&type=1&k=8886527', {
       headers: {
-        'X-Client-Info': '{"a":"3000","ch":"1002","v":"5.0.4","e":"1606890049759706700218369"}',
         'X-Host': 'mall.film-ticket.film.list'
       }
     }).then(res => {
@@ -57,16 +55,20 @@ export default {
       // 3、query传参跳转详情页
       // this.$router.push(`/detail?id=${id}`)
     }
+  },
+  filters: {
+    actorsFilter: (value) => {
+      if (value === undefined) return '暂无主演'
+      return value.map(item => item.name).join(' ')
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.content{
-  padding-bottom: 50px;
   li {
-    padding: 10px 15px;
-    height: 94px;
+    padding: 0.1rem;
+    height: 0.94rem;
     display: flex;
     .left-img {
       height: 100%;
@@ -75,18 +77,18 @@ export default {
       }
     }
     .right-content {
-      padding-left: 10px;
+      padding-left: 0.1rem;
       h4 {
-        font-size: 18px;
+        font-size: 0.18rem;
       }
       div {
-        font: 12px/1.5 微软雅黑;
+        font: 0.12rem/1.5 微软雅黑;
         color: #797d82;
         .grade {
-          height: 18px;
+          height: 0.18rem;
         }
         .actors {
-          width: 200px;
+          width: 0.2rem;
           overflow: hidden;
           -o-text-overflow: ellipsis;
           text-overflow: ellipsis;
@@ -95,5 +97,4 @@ export default {
       }
     }
   }
-}
 </style>
