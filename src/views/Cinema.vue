@@ -1,13 +1,146 @@
 <template>
-  <div>影院</div>
+  <div>
+    <van-nav-bar title="影院" left-arrow @click-left="onClickLeft" @click-right="onClickRight">
+      <template #left>
+          <span>{{$store.state.cityName}}</span>
+          <van-icon name="arrow-down" size="18" color="#000" />
+      </template>
+      <template #right>
+        <van-icon name="search" size="18" color="#000"/>
+      </template>
+    </van-nav-bar>
+    <div class="cinema-list-wrap" :style="`height:${height}`">
+      <ul class="cinema-list">
+        <li class="cinema-list-item" v-for="(data,index) in cinemaList" :key="index">
+          <div class="cinema-item-wrap">
+            <div class="cinema-info-lf cinema-info">
+              <span class="cinema-name">{{data.name}}</span>
+              <span class="cinema-address">{{data.address}}</span>
+            </div>
+            <div class="cinema-info-rt cinema-info">
+              <div>
+                <span class="cinema-lowPrice price-fmt">￥{{data.lowPrice/100}}</span>
+                <span class="upon"> 起</span>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
 </template>
 
 <script>
-export default {
+import Vue from 'vue'
+import http from '@/until/http'
+import BetterScroll from 'better-scroll'
+import { Icon, NavBar } from 'vant'
 
+Vue.use(Icon).use(NavBar)
+export default {
+  data () {
+    return {
+      cinemaList: [],
+      height: 0
+    }
+  },
+  methods: {
+    onClickLeft () {
+      this.$router.push('/city')
+    },
+    onClickRight () {
+      this.$router.push('/search')
+    }
+  },
+  mounted () {
+    // 访问cityid，cityName
+
+    this.height = document.documentElement.clientHeight - 100 + 'px'
+    http.get(`https://m.maizuo.com/gateway?cityId=${this.$store.state.cityId}&ticketFlag=1`, {
+      headers: {
+        'X-Host': 'mall.film-ticket.cinema.list'
+      }
+    }).then(res => {
+      this.cinemaList = res.data.data.cinemas
+
+      // 状态立即更新，但是dom异步渲染
+      this.$nextTick(() => {
+        new BetterScroll('.cinema-list-wrap', {
+          scrollbar: {
+            fade: true
+          },
+          click: true, // better-scroll 默认会阻止浏览器的原生 click 事件。当设置为 true，better-scroll 会派发一个 click 事件，我们会给派发的 event 参数加一个私有属性 _constructed，值为 true。
+          probeType: 2, // 这个属性设置之后可以监听得到了
+          mouseWheel: true
+        })
+      })
+    })
+  }
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+  .cinema-list-wrap{
+    overflow: hidden;
+    position: relative; // 修正滚动条的位置
+    .cinema-list{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      .cinema-list-item{
+        position: relative;
+        background-color: #fff;
+        padding: 0.15rem;
+        .cinema-item-wrap{
+          width: 100%;
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-pack: start;
+          -ms-flex-pack: start;
+          justify-content: flex-start;
+          -webkit-box-align: center;
+          .cinema-info-lf {
+            width: calc(100% - 0.65rem);
+            text-align: left;
+            padding-right: 0.15rem;
+            float: left;
+            span{
+              display: block;
+              max-width: 80%;
+              overflow: hidden;
+              -o-text-overflow: ellipsis;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+            .cinema-name{
+              color: #191a1b;
+              font-size: 0.15rem;
+            }
+            .cinema-address{
+              color: #797d82;
+              font-size: 0.12rem;
+              margin-top: 0.05rem;
+            }
+          }
+          .cinema-info-rt {
+            width: 0.7rem;
+            text-align: center;
+            float: right;
+            margin-right: -0.05rem;
+            .price-fmt{
+              font-size: 0.15rem;
+              color: #ff5f16;
+              height: 0!important;
+              display: inline-table!important;
+            }
+            .upon{
+              color: #ff5f16;
+              font-size: 0.1rem;
+            }
+          }
+        }
+      }
+    }
+  }
 </style>

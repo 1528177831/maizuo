@@ -1,8 +1,8 @@
 <template>
-  <nav  v-show="$route.meta.istrun">
+  <nav>
     <ul>
       <!-- 声明式导航 -->
-      <router-link to="/film" tag="li" active-class="linkactive">
+      <router-link to="/film/nowplaying" tag="li" active-class="linkactive">
         <i class="iconfont icon-training"></i>
         <span>电影</span>
       </router-link>

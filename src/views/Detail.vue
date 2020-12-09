@@ -1,10 +1,9 @@
 <template>
-  <div v-if="filmInfo">
-    <div class="film" v-if="imgShow">
+    <div class="film" v-if="filmInfo">
       <div class="back" @click='back'>
         <i class="iconfont icon-back"></i>
       </div>
-      <detail-header v-top class="film-header">
+      <detail-header class="film-header" v-top>
         <h4>{{filmInfo.name}}</h4>
       </detail-header>
       <div class="film-poster">
@@ -30,11 +29,11 @@
         <div class="film-nation-runtime grey-text">
           {{filmInfo.nation}} | {{filmInfo.runtime}}分钟
         </div>
-        <div class="film-synopsis grey-text" :class="isShow ? 'hide': ''">
+        <div class="film-synopsis grey-text" :class="!isShow ? 'hide': ''">
           {{filmInfo.synopsis}}
         </div>
         <div class="toggle">
-          <i class="iconfont" :class="isShow ? 'icon-moreunfold' : 'icon-less'" @click="check"></i>
+          <i class="iconfont" :class="!isShow ? 'icon-moreunfold' : 'icon-less'" @click="check"></i>
         </div>
       </div>
       <div class="actors">
@@ -54,58 +53,62 @@
       <div class="photos">
         <div class="photos-title-bar">
           <span class="photos-title-text">剧照</span>
-          <span class="photos-to-all" @click="imgShow=!imgShow">全部({{filmInfo.photos.length}})</span>
+          <span class="photos-to-all" @click="isPhotosShow=true">全部({{filmInfo.photos.length}})</span>
         </div>
         <detail-swiper :perslide="2" swiperclass="swiper-photos" style="height:1.5rem;padding-left:0.1rem;">
           <div class="swiper-slide" v-for="(item,index) in filmInfo.photos" :key="index">
-            <div class="photos-imgbox">
+            <div class="photos-imgbox" @click="handClick(index)">
               <img :src="item" alt="">
             </div>
           </div>
         </detail-swiper>
+        <photo v-show="isPhotosShow">
+          <detail-header class="film-photos">
+            <div class="back" @click="isPhotosShow=false">
+              <i class="iconfont icon-back"></i>
+            </div>
+            <h4>剧照({{filmInfo.photos.length}})</h4>
+            <ul class="photos-list">
+              <li class="photos-list-item" v-for="(item,index) in filmInfo.photos" :key='index'  @click="handClick(index)">
+                <img :src="item" alt="">
+              </li>
+            </ul>
+          </detail-header>
+        </photo>
       </div>
       <div class="goSchedule">
         选座购票
       </div>
     </div>
-    <div class="film" v-else>
-      <div class="back" @click='imgShow=!imgShow'>
-        <i class="iconfont icon-back"></i>
-      </div>
-      <detail-header class="film-photos">
-        <h4>{{filmInfo.name}}</h4>
-        <ul class="photos-list">
-          <li class="photos-list-item" v-for="(item,index) in filmInfo.photos" :key='index'>
-            <img :src="item" alt="">
-          </li>
-        </ul>
-      </detail-header>
-    </div>
-  </div>
 </template>
 
 <script>
+import Vue from 'vue'
 import http from '@/until/http'
 import moment from 'moment'
 import detailSwiper from './detail/DetailSwiper'
 import detailHeader from './detail/DetailHeader'
+import photo from './detail/Photo'
+import { ImagePreview } from 'vant'
+Vue.use(ImagePreview)
 export default {
   data () {
     return {
       filmInfo: null,
-      isShow: true,
-      imgShow: true
+      isShow: false,
+      isPhotosShow: false
     }
   },
   components: {
     detailSwiper,
-    detailHeader
+    detailHeader,
+    photo
   },
   directives: {
     top: {
-      inserted: function (el) {
+      inserted: function (el, binding) {
+        el.style.display = 'none'
         window.onscroll = function () {
-          el.style.display = 'none'
           if ((document.body.scrollTop || document.documentElement.scrollTop) > 44) {
             el.style.display = 'block'
           } else {
@@ -124,6 +127,15 @@ export default {
     },
     back () {
       this.$router.back()
+    },
+    handClick (index) {
+      ImagePreview({
+        images: this.filmInfo.photos,
+        startPosition: index,
+        loop: false,
+        closeable: true,
+        closeIconPosition: 'top-left'
+      })
     }
   },
   mounted () {
@@ -131,6 +143,8 @@ export default {
     // console.log('利用获取的id，ajax请求后端接口',this.$route.params.myid)
     // query传参进入详情页
     // console.log('利用获取的id，ajax请求后端接口',this.$route.query)
+    // 隐藏tabbar
+    this.$store.commit('hideTabber', false)
     http(`/api/gateway?filmId=${this.$route.params.myid}`, {
       headers: {
         'X-Host': 'mall.film-ticket.film.info'
@@ -139,6 +153,9 @@ export default {
       console.log(res.data.data.film)
       this.filmInfo = res.data.data.film
     })
+  },
+  beforeDestroy () {
+    this.$store.commit('showTabber', true)
   },
   filters: {
     formatDate: (value) => {
@@ -150,6 +167,7 @@ export default {
 
 <style lang="scss" scoped>
   .film{
+    background-color: #f4f4f4;
     .back {
       width: .3rem;
       height: .3rem;
@@ -162,7 +180,7 @@ export default {
       top: .07rem;
       left: .07rem;
       opacity: .5;
-      z-index: 12;
+      z-index: 3;
     }
     .film-header {
       position: fixed;
@@ -171,7 +189,7 @@ export default {
       right:0;
       height: .44rem;
       background-color: white;
-      z-index: 10;
+      z-index: 2;
       text-align: center;
       line-height: .44rem;
       transition: all .3s;
@@ -344,6 +362,7 @@ export default {
       color: #fff;
       font-size: 16px;
       line-height: 49px;
+      z-index: 1;
     }
     .film-photos {
       position: fixed;

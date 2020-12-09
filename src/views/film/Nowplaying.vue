@@ -1,7 +1,13 @@
 <template>
   <div class="content" style="background:#fff;">
-    <ul>
-      <li v-for="item in list" :key="item.filmId" @click="handleClick(item.filmId)">
+    <van-list
+      v-model="loading"
+      :finished="finished"
+      finished-text="我是底线的"
+      @load="onLoad"
+      :immediate-check = "false"
+    >
+      <van-cell v-for="item in list" :key="item.filmId" @click="handleClick(item.filmId)">
         <div class='left-img'><img :src="item.poster"></div>
         <div class='right-content'>
           <h4>{{item.name}}</h4>
@@ -16,27 +22,36 @@
             </div>
           </div>
         </div>
-      </li>
-    </ul>
+      </van-cell>
+    </van-list>
   </div>
 </template>
 
 <script>
 import http from '@/until/http'
+import Vue from 'vue'
+import { List, cell } from 'vant'
+
+Vue.use(List).use(cell)
 export default {
   data () {
     return {
-      list: []
+      list: [],
+      loading: false, // 是否正在加载中，防止多次触发
+      finished: false,
+      current: 1, // 记录第几页
+      total: 0 // 总数据长度
     }
   },
-  created () {
-    http('/api/gateway?cityId=110100&pageNum=1&pageSize=10&type=1&k=8886527', {
+  mounted () {
+    http(`/api/gateway?cityId=${this.$store.state.cityId}&pageNum=1&pageSize=10&type=1`, {
       headers: {
         'X-Host': 'mall.film-ticket.film.list'
       }
     }).then(res => {
       // console.log(res);
       this.list = res.data.data.films
+      this.total = res.data.data.total
     })
   },
   methods: {
@@ -54,6 +69,21 @@ export default {
       // })
       // 3、query传参跳转详情页
       // this.$router.push(`/detail?id=${id}`)
+    },
+    onLoad () {
+      if (this.list.length === this.total && this.list.length !== 0) {
+        this.finished = true
+        return
+      }
+      this.current++
+      http(`/api/gateway?cityId=${this.$store.state.cityId}&pageNum=${this.current}&pageSize=10&type=1`, {
+        headers: {
+          'X-Host': 'mall.film-ticket.film.list'
+        }
+      }).then(res => {
+        this.list = [...this.list, ...res.data.data.films]
+        this.loading = false
+      })
     }
   },
   filters: {
@@ -66,33 +96,36 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  li {
+  .van-cell {
     padding: 0.1rem;
-    height: 0.94rem;
     display: flex;
-    .left-img {
-      height: 100%;
-      img {
-        height: 100%;
-      }
-    }
-    .right-content {
-      padding-left: 0.1rem;
-      h4 {
-        font-size: 0.18rem;
-      }
-      div {
-        font: 0.12rem/1.5 微软雅黑;
-        color: #797d82;
-        .grade {
-          height: 0.18rem;
+    .van-cell__value{
+      display: flex;
+      flex-direction: row;
+      .left-img {
+        width: 0.6rem;
+        img {
+          width: 100%;
         }
-        .actors {
-          width: 0.2rem;
-          overflow: hidden;
-          -o-text-overflow: ellipsis;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+      }
+      .right-content {
+        padding-left: 0.1rem;
+        h4 {
+          font-size: 0.18rem;
+        }
+        div {
+          font: 0.12rem/1.5 微软雅黑;
+          color: #797d82;
+          .grade {
+            height: 0.18rem;
+          }
+          .actors {
+            width: 2.0rem;
+            overflow: hidden;
+            -o-text-overflow: ellipsis;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
         }
       }
     }
