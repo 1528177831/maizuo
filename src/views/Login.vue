@@ -21,6 +21,7 @@
 
 <script>
 import axios from 'axios'
+import { mapMutations } from 'vuex'
 export default {
   data () {
     return {
@@ -29,6 +30,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('TabbarModule', ['hideTabber', 'showTabber']),
     send () {
       // 发送异步请求
       axios({
@@ -58,10 +60,12 @@ export default {
     }
   },
   mounted () {
-    this.$store.commit('hideTabber', false)
+    // this.$store.commit('hideTabber')
+    this.hideTabber()
   },
   beforeDestroy () {
-    this.$store.commit('showTabber', true)
+    // this.$store.commit('showTabber')
+    this.showTabber()
   }
 }
 </script>

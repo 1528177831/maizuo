@@ -1,32 +1,28 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import CinemaModule from './module/cinema'
+import TabbarModule from './module/tabbar'
+import CityModule from './module/city'
+import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
 // store "全局的对象"
 export default new Vuex.Store({
+  plugins: [createPersistedState()],
   // 共享的状态
   state: {
-    cityId: '110100',
-    cityName: '北京',
-    isTabberShow: true
   },
   // 集中式修改状态--被监控
   mutations: {
-    changeCity (state, { id, name }) {
-      state.cityId = id
-      state.cityName = name
-    },
-    hideTabber (state) {
-      state.isTabberShow = false
-    },
-    showTabber (state) {
-      state.isTabberShow = true
-    }
   },
+  // 异步
   actions: {
   },
   modules: {
+    CinemaModule,
+    TabbarModule,
+    CityModule
   }
 })
 

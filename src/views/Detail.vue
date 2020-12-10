@@ -90,6 +90,7 @@ import detailSwiper from './detail/DetailSwiper'
 import detailHeader from './detail/DetailHeader'
 import photo from './detail/Photo'
 import { ImagePreview } from 'vant'
+import { mapMutations } from 'vuex'
 Vue.use(ImagePreview)
 export default {
   data () {
@@ -122,6 +123,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('TabbarModule', ['hideTabber', 'showTabber']),
     check () {
       this.isShow = !this.isShow
     },
@@ -144,18 +146,17 @@ export default {
     // query传参进入详情页
     // console.log('利用获取的id，ajax请求后端接口',this.$route.query)
     // 隐藏tabbar
-    this.$store.commit('hideTabber', false)
+    this.hideTabber()
     http(`/api/gateway?filmId=${this.$route.params.myid}`, {
       headers: {
         'X-Host': 'mall.film-ticket.film.info'
       }
     }).then(res => {
-      console.log(res.data.data.film)
       this.filmInfo = res.data.data.film
     })
   },
   beforeDestroy () {
-    this.$store.commit('showTabber', true)
+    this.showTabber()
   },
   filters: {
     formatDate: (value) => {

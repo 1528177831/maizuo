@@ -31,6 +31,7 @@
 import http from '@/until/http'
 import Vue from 'vue'
 import { List, cell } from 'vant'
+import { mapState } from 'vuex'
 
 Vue.use(List).use(cell)
 export default {
@@ -43,8 +44,11 @@ export default {
       total: 0 // 总数据长度
     }
   },
+  computed: {
+    ...mapState('CityModule', ['cityId'])
+  },
   mounted () {
-    http(`/api/gateway?cityId=${this.$store.state.cityId}&pageNum=1&pageSize=10&type=1`, {
+    http(`/api/gateway?cityId=${this.cityId}&pageNum=1&pageSize=10&type=1`, {
       headers: {
         'X-Host': 'mall.film-ticket.film.list'
       }
@@ -76,7 +80,7 @@ export default {
         return
       }
       this.current++
-      http(`/api/gateway?cityId=${this.$store.state.cityId}&pageNum=${this.current}&pageSize=10&type=1`, {
+      http(`/api/gateway?cityId=${this.cityId}&pageNum=${this.current}&pageSize=10&type=1`, {
         headers: {
           'X-Host': 'mall.film-ticket.film.list'
         }

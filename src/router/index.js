@@ -58,7 +58,7 @@ const routes = [
     component: () => import('../views/city/City.vue')
   },
   {
-    path: '/search',
+    path: '/cinema/search',
     component: () => import('../views/search/Search.vue')
   },
   {

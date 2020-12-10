@@ -2,16 +2,27 @@
   <div>
     <van-nav-bar title="影院" left-arrow @click-left="onClickLeft" @click-right="onClickRight">
       <template #left>
-          <span>{{$store.state.cityName}}</span>
+          <span>{{cityName}}</span>
           <van-icon name="arrow-down" size="18" color="#000" />
       </template>
       <template #right>
         <van-icon name="search" size="18" color="#000"/>
       </template>
     </van-nav-bar>
+    <div class='operate'>
+      <van-dropdown-menu>
+        <van-dropdown-item v-model="district" :options="districtList" @change="ondistrictChange(value)" />
+      </van-dropdown-menu>
+      <van-dropdown-menu>
+        <van-dropdown-item v-model="convert" :options="convertList" />
+      </van-dropdown-menu>
+      <van-dropdown-menu>
+        <van-dropdown-item v-model="distance" :options="distanceList" />
+      </van-dropdown-menu>
+    </div>
     <div class="cinema-list-wrap" :style="`height:${height}`">
       <ul class="cinema-list">
-        <li class="cinema-list-item" v-for="(data,index) in cinemaList" :key="index">
+        <li class="cinema-list-item" v-for="(data,index) in cinemaListGetByDistrictName" :key="index">
           <div class="cinema-item-wrap">
             <div class="cinema-info-lf cinema-info">
               <span class="cinema-name">{{data.name}}</span>
@@ -32,40 +43,85 @@
 
 <script>
 import Vue from 'vue'
-import http from '@/until/http'
 import BetterScroll from 'better-scroll'
-import { Icon, NavBar } from 'vant'
-
-Vue.use(Icon).use(NavBar)
+import { Icon, NavBar, DropdownMenu, DropdownItem } from 'vant'
+import { mapState, mapMutations, mapActions, mapGetters } from 'vuex'
+Vue.use(Icon).use(NavBar).use(DropdownMenu).use(DropdownItem)
 export default {
   data () {
     return {
-      cinemaList: [],
-      height: 0
+      height: 0,
+      scroll: null
     }
   },
   methods: {
+    ...mapMutations('CinemaModule', ['clearCinemaList']),
+    ...mapActions('CinemaModule', ['getCinemaList']),
     onClickLeft () {
+      this.clearCinemaList()
       this.$router.push('/city')
     },
     onClickRight () {
-      this.$router.push('/search')
+      this.$router.push('/cinema/search')
+    },
+    ondistrictChange (value) {
+      this.$nextTick(() => {
+        this.scroll.refresh()
+      })
+    }
+  },
+  computed: {
+    ...mapState('CityModule', ['cityId', 'cityName']),
+    ...mapState('CinemaModule', ['cinemaList', 'districtList', 'convertList', 'distanceList']),
+    ...mapGetters('CinemaModule', ['cinemaListGetByDistrictName']),
+    district: {
+      get () {
+        return this.$store.state.CinemaModule.district
+      },
+      set (value) {
+        this.$store.state.CinemaModule.district = value
+      }
+    },
+    convert: {
+      get () {
+        return this.$store.state.CinemaModule.convert
+      },
+      set (value) {
+        this.$store.state.CinemaModule.convert = value
+      }
+    },
+    distance: {
+      get () {
+        return this.$store.state.CinemaModule.distance
+      },
+      set (value) {
+        this.$store.state.CinemaModule.distance = value
+      }
     }
   },
   mounted () {
     // 访问cityid，cityName
-
-    this.height = document.documentElement.clientHeight - 100 + 'px'
-    http.get(`https://m.maizuo.com/gateway?cityId=${this.$store.state.cityId}&ticketFlag=1`, {
-      headers: {
-        'X-Host': 'mall.film-ticket.cinema.list'
-      }
-    }).then(res => {
-      this.cinemaList = res.data.data.cinemas
-
+    this.height = document.documentElement.clientHeight - 148 + 'px'
+    if (this.cinemaList.length === 0) {
+      // vuex 异步流程
+      this.getCinemaList(this.cityId).then(res => {
+        // 状态立即更新，但是dom异步渲染
+        this.$nextTick(() => {
+          this.scroll = new BetterScroll('.cinema-list-wrap', {
+            scrollbar: {
+              fade: true
+            },
+            click: true, // better-scroll 默认会阻止浏览器的原生 click 事件。当设置为 true，better-scroll 会派发一个 click 事件，我们会给派发的 event 参数加一个私有属性 _constructed，值为 true。
+            probeType: 2, // 这个属性设置之后可以监听得到了
+            mouseWheel: true
+          })
+        })
+      })
+    } else {
+      // 走缓存的时候
       // 状态立即更新，但是dom异步渲染
       this.$nextTick(() => {
-        new BetterScroll('.cinema-list-wrap', {
+        this.scroll = new BetterScroll('.cinema-list-wrap', {
           scrollbar: {
             fade: true
           },
@@ -74,7 +130,7 @@ export default {
           mouseWheel: true
         })
       })
-    })
+    }
   }
 }
 </script>
@@ -141,6 +197,12 @@ export default {
           }
         }
       }
+    }
+  }
+  .operate {
+    display: flex;
+    .van-dropdown-menu {
+      flex: 1;
     }
   }
 </style>

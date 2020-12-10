@@ -2,17 +2,9 @@
   <nav>
     <ul>
       <!-- 声明式导航 -->
-      <router-link to="/film/nowplaying" tag="li" active-class="linkactive">
-        <i class="iconfont icon-training"></i>
-        <span>电影</span>
-      </router-link>
-      <router-link to="/cinema" tag="li" active-class="linkactive">
-        <i class="iconfont icon-store"></i>
-        <span>影院</span>
-      </router-link>
-      <router-link to="/center" tag="li" active-class="linkactive">
-        <i class="iconfont icon-account"></i>
-        <span>我的</span>
+      <router-link v-for="(item,index) in list" :key="index" :to="item.path" tag="li" active-class="linkactive">
+        <i class="iconfont" :class="item.icon"></i>
+        <span>{{item.name}}</span>
       </router-link>
     </ul>
   </nav>
@@ -20,7 +12,27 @@
 
 <script>
 export default {
-
+  data () {
+    return {
+      list: [
+        {
+          name: '电影',
+          path: '/film/nowplaying',
+          icon: 'icon-training'
+        },
+        {
+          name: '影院',
+          path: '/cinema',
+          icon: 'icon-store'
+        },
+        {
+          name: '我的',
+          path: '/center',
+          icon: 'icon-account'
+        }
+      ]
+    }
+  }
 }
 </script>
 
