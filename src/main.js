@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import './stylesheet/reset.css'
-import './until/index.js'
+import './until/index'
 import qs from 'qs'
 Vue.prototype.$qs = qs
 Vue.config.productionTip = false

@@ -1,4 +1,5 @@
 <template>
+  <v-touch v-on:swiperight="onSwipeRight">
     <div class="film" v-if="filmInfo">
       <div class="back" @click='back'>
         <i class="iconfont icon-back"></i>
@@ -80,6 +81,7 @@
         选座购票
       </div>
     </div>
+  </v-touch>
 </template>
 
 <script>
@@ -91,6 +93,8 @@ import detailHeader from './detail/DetailHeader'
 import photo from './detail/Photo'
 import { ImagePreview } from 'vant'
 import { mapMutations } from 'vuex'
+var VueTouch = require('vue-touch')
+Vue.use(VueTouch, { name: 'v-touch' })
 Vue.use(ImagePreview)
 export default {
   data () {
@@ -138,6 +142,9 @@ export default {
         closeable: true,
         closeIconPosition: 'top-left'
       })
+    },
+    onSwipeRight () {
+      this.$router.back()
     }
   },
   mounted () {

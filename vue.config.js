@@ -1,6 +1,8 @@
 // 关闭eslint，反向代理......
 module.exports = {
-  lintOnSave: false,
+  // lintOnSave: false,
+  productionSourceMap: false,
+  publicPath: './',
   devServer: {
     proxy: {
       '/api': {

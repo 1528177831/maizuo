@@ -11,7 +11,7 @@
     </van-nav-bar>
     <div class='operate'>
       <van-dropdown-menu>
-        <van-dropdown-item v-model="district" :options="districtList" @change="ondistrictChange(value)" />
+        <van-dropdown-item v-model="district" :options="districtList" @change="ondistrictChange" />
       </van-dropdown-menu>
       <van-dropdown-menu>
         <van-dropdown-item v-model="convert" :options="convertList" />
@@ -66,6 +66,7 @@ export default {
     },
     ondistrictChange (value) {
       this.$nextTick(() => {
+        /* 检测到数据变化时，此时如果不使用$nextTick方法，refresh方法会在DOM更新前直接调用 */
         this.scroll.refresh()
       })
     }
